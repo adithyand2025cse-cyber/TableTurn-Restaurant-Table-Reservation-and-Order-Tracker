@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Reservations - TableTurn</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f5f6fa;
+            color: #222;
+        }
+
+        /* NAVBAR */
+        nav {
+            background: #111827;
+            color: white;
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+            color: #f59e0b;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 25px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 15px;
+            transition: 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: #f59e0b;
+        }
+
+        /* PAGE HEADER */
+        .page-header {
+            background: linear-gradient(135deg, #111827, #374151);
+            color: white;
+            padding: 50px 20px;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 38px;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: #d1d5db;
+        }
+
+        /* MAIN */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 30px;
+        }
+
+        /* FORM CARD */
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .card h2 {
+            margin-bottom: 25px;
+            color: #111827;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 7px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #f59e0b;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 7px;
+            background: #f59e0b;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: #d97706;
+        }
+
+        /* RESERVATION TABLE */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th {
+            background: #111827;
+            color: white;
+            padding: 13px;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        table td {
+            padding: 13px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 13px;
+        }
+
+        table tr:hover {
+            background: #f9fafb;
+        }
+
+        /* STATUS */
+        .status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .confirmed {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .cancelled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .completed {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        /* ACTION BUTTONS */
+        .action-btn {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+            font-size: 12px;
+            margin: 2px;
+        }
+
+        .confirm-btn {
+            background: #16a34a;
+        }
+
+        .cancel-btn {
+            background: #dc2626;
+        }
+
+        .delete-btn {
+            background: #6b7280;
+        }
+
+        .action-btn:hover {
+            opacity: 0.8;
+        }
+
+        /* MESSAGE */
+        .message {
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 7px;
+            display: none;
+            font-weight: bold;
+        }
+
+        .success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* FOOTER */
+        footer {
+            margin-top: 60px;
+            background: #111827;
+            color: #d1d5db;
+            text-align: center;
+            padding: 25px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .page-header h1 {
+                font-size: 30px;
+            }
+
+            .container {
+                width: 95%;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            nav {
+                padding: 15px;
+            }
+
+            nav ul {
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav>
+
+    <div class="logo">
+        🍽️ TableTurn
+    </div>
+
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li><a href="/tables">Tables</a></li>
+        <li><a href="/reservation">Reservations</a></li>
+        <li><a href="/orders">Orders</a></li>
+        <li><a href="/bills">Bills</a></li>
+    </ul>
+
+</nav>
+
+
+<!-- PAGE HEADER -->
+<section class="page-header">
+
+    <h1>Table Reservations</h1>
+
+    <p>
+        Reserve a table and manage restaurant bookings
+    </p>
+
+</section>
+
+
+<!-- MAIN CONTENT -->
+<div class="container">
+
+    <div id="message" class="message"></div>
+
+    <div class="grid">
+
+        <!-- RESERVATION FORM -->
+        <div class="card">
+
+            <h2>➕ New Reservation</h2>
+
+            <form id="reservationForm">
+
+                <div class="form-group">
+
+                    <label for="tableId">
+                        Select Table
+                    </label>
+
+                    <select id="tableId" required>
+
+                        <option value="">
+                            -- Select Table --
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="customerName">
+                        Customer Name
+                    </label>
+
+                    <input
+                            type="text"
+                            id="customerName"
+                            placeholder="Enter customer name"
+                            required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="customerPhone">
+                        Phone Number
+                    </label>
+
+                    <input
+                            type="tel"
+                            id="customerPhone"
+                            placeholder="Enter phone number"
+                            required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="customerEmail">
+                        Email
+                    </label>
+
+                    <input
+                            type="email"
+                            id="customerEmail"
+                            placeholder="Enter email address"
+                            required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="reservationDate">
+                        Reservation Date
+                    </label>
+
+                    <input
+                            type="date"
+                            id="reservationDate"
+                            required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="reservationTime">
+                        Reservation Time
+                    </label>
+
+                    <input
+                            type="time"
+                            id="reservationTime"
+                            required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="numberOfGuests">
+                        Number of Guests
+                    </label>
+
+                    <input
+                            type="number"
+                            id="numberOfGuests"
+                            min="1"
+                            max="50"
+                            placeholder="Number of guests"
+                            required
+                    >
+
+                </div>
+
+
+                <button
+                        type="submit"
+                        class="btn"
+                >
+                    Reserve Table
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <!-- RESERVATION LIST -->
+        <div class="card">
+
+            <h2>📋 Reservation List</h2>
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                    <tr>
+
+                        <th>ID</th>
+
+                        <th>Customer</th>
+
+                        <th>Table</th>
+
+                        <th>Date</th>
+
+                        <th>Time</th>
+
+                        <th>Guests</th>
+
+                        <th>Status</th>
+
+                        <th>Actions</th>
+
+                    </tr>
+
+                    </thead>
+
+                    <tbody id="reservationTableBody">
+
+                    <tr>
+
+                        <td colspan="8"
+                            style="text-align:center; padding:30px;">
+
+                            Loading reservations...
+
+                        </td>
+
+                    </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- FOOTER -->
+<footer>
+
+    <p>
+        © 2026 TableTurn Restaurant Management System
+    </p>
+
+</footer>
+
+
+<script>
+
+    /* =========================================
+       GLOBAL VARIABLES
+    ========================================= */
+
+    const API_URL = "/api/reservations";
+    const TABLE_API_URL = "/api/tables";
+
+
+    /* =========================================
+       PAGE LOAD
+    ========================================= */
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        loadTables();
+
+        loadReservations();
+
+        setMinimumDate();
+
+    });
+
+
+    /* =========================================
+       SET TODAY AS MINIMUM DATE
+    ========================================= */
+
+    function setMinimumDate() {
+
+        const today = new Date();
+
+        const year = today.getFullYear();
+
+        const month = String(today.getMonth() + 1).padStart(2, "0");
+
+        const day = String(today.getDate()).padStart(2, "0");
+
+        const dateString =
+            year + "-" + month + "-" + day;
+
+        document.getElementById("reservationDate").min =
+            dateString;
+
+    }
+
+
+    /* =========================================
+       LOAD AVAILABLE TABLES
+    ========================================= */
+
+    async function loadTables() {
+
+        try {
+
+            const response =
+                await fetch(TABLE_API_URL);
+
+            if (!response.ok) {
+
+                throw new Error("Failed to load tables");
+
+            }
+
+            const tables =
+                await response.json();
+
+            const select =
+                document.getElementById("tableId");
+
+            select.innerHTML =
+                '<option value="">-- Select Table --</option>';
+
+
+            tables.forEach(function (table) {
+
+                /*
+                 * Only show available tables
+                 */
+
+                if (
+                    !table.status ||
+                    table.status.toUpperCase() === "AVAILABLE"
+                ) {
+
+                    const option =
+                        document.createElement("option");
+
+                    option.value = table.id;
+
+                    option.textContent =
+                        "Table " +
+                        table.tableNumber +
+                        " - Capacity: " +
+                        table.capacity +
+                        " - " +
+                        (table.location || "Restaurant");
+
+                    select.appendChild(option);
+
+                }
+
+            });
+
+        } catch (error) {
+
+            console.error(error);
+
+            showMessage(
+                "Unable to load restaurant tables.",
+                "error"
+            );
+
+        }
+
+    }
+
+
+    /* =========================================
+       CREATE RESERVATION
+    ========================================= */
+
+    document
+        .getElementById("reservationForm")
+        .addEventListener("submit", async function (event) {
+
+            event.preventDefault();
+
+
+            const reservation = {
+
+                tableId:
+                    Number(
+                        document.getElementById("tableId").value
+                    ),
+
+                customerName:
+                    document.getElementById("customerName").value.trim(),
+
+                customerPhone:
+                    document.getElementById("customerPhone").value.trim(),
+
+                customerEmail:
+                    document.getElementById("customerEmail").value.trim(),
+
+                reservationDate:
+                document.getElementById("reservationDate").value,
+
+                reservationTime:
+                document.getElementById("reservationTime").value,
+
+                numberOfGuests:
+                    Number(
+                        document.getElementById("numberOfGuests").value
+                    ),
+
+                status: "PENDING"
+
+            };
+
+
+            try {
+
+                const response =
+                    await fetch(API_URL, {
+
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body:
+                            JSON.stringify(reservation)
+
+                    });
+
+
+                if (!response.ok) {
+
+                    const errorText =
+                        await response.text();
+
+                    throw new Error(
+                        errorText || "Failed to create reservation"
+                    );
+
+                }
+
+
+                showMessage(
+                    "Reservation created successfully!",
+                    "success"
+                );
+
+
+                document
+                    .getElementById("reservationForm")
+                    .reset();
+
+
+                loadReservations();
+
+                loadTables();
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                showMessage(
+                    "Failed to create reservation.",
+                    "error"
+                );
+
+            }
+
+        });
+
+
+    /* =========================================
+       LOAD ALL RESERVATIONS
+    ========================================= */
+
+    async function loadReservations() {
+
+        try {
+
+            const response =
+                await fetch(API_URL);
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Failed to load reservations"
+                );
+
+            }
+
+
+            const reservations =
+                await response.json();
+
+
+            displayReservations(reservations);
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            document.getElementById(
+                "reservationTableBody"
+            ).innerHTML = `
+
+                <tr>
+
+                    <td colspan="8"
+                        style="text-align:center; color:red;">
+
+                        Unable to load reservations.
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        }
+
+    }
+
+
+    /* =========================================
+       DISPLAY RESERVATIONS
+    ========================================= */
+
+    function displayReservations(reservations) {
+
+        const tbody =
+            document.getElementById(
+                "reservationTableBody"
+            );
+
+
+        if (!reservations || reservations.length === 0) {
+
+            tbody.innerHTML = `
+
+                <tr>
+
+                    <td colspan="8"
+                        style="text-align:center; padding:30px;">
+
+                        No reservations found.
+
+                    </td>
+
+                </tr>
+
+            `;
+
+            return;
+
+        }
+
+
+        tbody.innerHTML = "";
+
+
+        reservations.forEach(function (reservation) {
+
+            const row =
+                document.createElement("tr");
+
+
+            const status =
+                reservation.status || "PENDING";
+
+
+            row.innerHTML = `
+
+                <td>
+                    ${reservation.id}
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                reservation.customerName || "-"
+            )}
+                </td>
+
+                <td>
+                    ${reservation.tableId || "-"}
+                </td>
+
+                <td>
+                    ${reservation.reservationDate || "-"}
+                </td>
+
+                <td>
+                    ${reservation.reservationTime || "-"}
+                </td>
+
+                <td>
+                    ${reservation.numberOfGuests || "-"}
+                </td>
+
+                <td>
+                    <span class="status ${getStatusClass(status)}">
+                        ${status}
+                    </span>
+                </td>
+
+                <td>
+
+                    ${
+                status.toUpperCase() === "PENDING"
+                    ?
+                    `
+                        <button
+                            class="action-btn confirm-btn"
+                            onclick="updateStatus(${reservation.id}, 'CONFIRMED')"
+                        >
+                            Confirm
+                        </button>
+
+                        <button
+                            class="action-btn cancel-btn"
+                            onclick="updateStatus(${reservation.id}, 'CANCELLED')"
+                        >
+                            Cancel
+                        </button>
+                        `
+                    :
+                    ""
+            }
+
+
+                    <button
+                        class="action-btn delete-btn"
+                        onclick="deleteReservation(${reservation.id})"
+                    >
+                        Delete
+                    </button>
+
+                </td>
+
+            `;
+
+
+            tbody.appendChild(row);
+
+        });
+
+    }
+
+
+    /* =========================================
+       UPDATE RESERVATION STATUS
+    ========================================= */
+
+    async function updateStatus(id, newStatus) {
+
+        try {
+
+            /*
+             * First get the existing reservation
+             */
+
+            const getResponse =
+                await fetch(
+                    API_URL + "/" + id
+                );
+
+
+            if (!getResponse.ok) {
+
+                throw new Error(
+                    "Reservation not found"
+                );
+
+            }
+
+
+            const reservation =
+                await getResponse.json();
+
+
+            reservation.status =
+                newStatus;
+
+
+            const response =
+                await fetch(
+                    API_URL + "/" + id,
+                    {
+
+                        method: "PUT",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:
+                            JSON.stringify(reservation)
+
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Failed to update reservation"
+                );
+
+            }
+
+
+            showMessage(
+                "Reservation status updated to " +
+                newStatus,
+                "success"
+            );
+
+
+            loadReservations();
+
+            loadTables();
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            showMessage(
+                "Unable to update reservation.",
+                "error"
+            );
+
+        }
+
+    }
+
+
+    /* =========================================
+       DELETE RESERVATION
+    ========================================= */
+
+    async function deleteReservation(id) {
+
+        const confirmed =
+            confirm(
+                "Are you sure you want to delete this reservation?"
+            );
+
+
+        if (!confirmed) {
+
+            return;
+
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    API_URL + "/" + id,
+                    {
+                        method: "DELETE"
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Failed to delete reservation"
+                );
+
+            }
+
+
+            showMessage(
+                "Reservation deleted successfully.",
+                "success"
+            );
+
+
+            loadReservations();
+
+            loadTables();
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            showMessage(
+                "Unable to delete reservation.",
+                "error"
+            );
+
+        }
+
+    }
+
+
+    /* =========================================
+       STATUS CSS CLASS
+    ========================================= */
+
+    function getStatusClass(status) {
+
+        const value =
+            String(status).toUpperCase();
+
+
+        if (value === "CONFIRMED") {
+
+            return "confirmed";
+
+        }
+
+
+        if (value === "CANCELLED") {
+
+            return "cancelled";
+
+        }
+
+
+        if (value === "COMPLETED") {
+
+            return "completed";
+
+        }
+
+
+        return "pending";
+
+    }
+
+
+    /* =========================================
+       MESSAGE
+    ========================================= */
+
+    function showMessage(message, type) {
+
+        const element =
+            document.getElementById("message");
+
+
+        element.textContent =
+            message;
+
+
+        element.className =
+            "message " + type;
+
+
+        element.style.display =
+            "block";
+
+
+        setTimeout(function () {
+
+            element.style.display =
+                "none";
+
+        }, 4000);
+
+    }
+
+
+    /* =========================================
+       HTML ESCAPE
+    ========================================= */
+
+    function escapeHtml(value) {
+
+        return String(value)
+
+            .replace(/&/g, "&amp;")
+
+            .replace(/</g, "&lt;")
+
+            .replace(/>/g, "&gt;")
+
+            .replace(/"/g, "&quot;")
+
+            .replace(/'/g, "&#039;");
+
+    }
+
+</script>
+
+</body>
+</html>

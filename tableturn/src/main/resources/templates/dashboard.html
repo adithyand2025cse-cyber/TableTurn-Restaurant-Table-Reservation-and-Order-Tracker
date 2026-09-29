@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard - TableTurn</title>
+
+    <style>
+
+        /* ==============================
+           RESET
+           ============================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f5f6f8;
+            color: #222;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+
+        /* ==============================
+           NAVBAR
+           ============================== */
+
+        .navbar {
+            background: #111;
+            color: white;
+
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            min-height: 70px;
+
+            margin: auto;
+            padding: 0 20px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 27px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: white;
+            font-size: 15px;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #aaa;
+        }
+
+
+        /* ==============================
+           PAGE
+           ============================== */
+
+        .dashboard-page {
+            min-height: 80vh;
+            padding: 40px 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: auto;
+        }
+
+
+        /* ==============================
+           HEADER
+           ============================== */
+
+        .dashboard-header {
+            margin-bottom: 30px;
+        }
+
+        .dashboard-header h1 {
+            font-size: 34px;
+            margin-bottom: 8px;
+        }
+
+        .dashboard-header p {
+            color: #777;
+        }
+
+
+        /* ==============================
+           STAT CARDS
+           ============================== */
+
+        .stats-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 20px;
+
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+
+            padding: 25px;
+
+            border-radius: 12px;
+
+            box-shadow:
+                    0 4px 15px rgba(0,0,0,0.06);
+
+            transition: 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .stat-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 8px;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+
+        /* ==============================
+           QUICK ACTIONS
+           ============================== */
+
+        .section-card {
+            background: white;
+
+            padding: 25px;
+
+            border-radius: 12px;
+
+            margin-bottom: 25px;
+
+            box-shadow:
+                    0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .section-card h2 {
+            margin-bottom: 20px;
+        }
+
+        .quick-actions {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 15px;
+        }
+
+        .quick-action {
+            padding: 18px;
+
+            border: 1px solid #ddd;
+
+            border-radius: 8px;
+
+            text-align: center;
+
+            transition: 0.3s;
+        }
+
+        .quick-action:hover {
+            background: #111;
+            color: white;
+        }
+
+        .quick-action-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .quick-action h3 {
+            font-size: 15px;
+        }
+
+
+        /* ==============================
+           TABLE
+           ============================== */
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 13px;
+
+            text-align: left;
+
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f5f5f5;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: #fafafa;
+        }
+
+
+        /* ==============================
+           STATUS
+           ============================== */
+
+        .status {
+            display: inline-block;
+
+            padding: 5px 10px;
+
+            border-radius: 20px;
+
+            font-size: 12px;
+
+            font-weight: bold;
+        }
+
+        .available {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .reserved {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .occupied {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .maintenance {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .confirmed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .completed {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+
+        /* ==============================
+           EMPTY / LOADING
+           ============================== */
+
+        .loading {
+            text-align: center;
+            padding: 25px;
+            color: #777;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 25px;
+            color: #777;
+        }
+
+
+        /* ==============================
+           FOOTER
+           ============================== */
+
+        .footer {
+            background: #111;
+
+            color: white;
+
+            text-align: center;
+
+            padding: 40px 20px;
+        }
+
+        .footer h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .footer p {
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+
+
+        /* ==============================
+           RESPONSIVE
+           ============================== */
+
+        @media (max-width: 1000px) {
+
+            .nav-container {
+                flex-direction: column;
+
+                padding: 15px;
+
+                gap: 15px;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .stats-grid {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+            .quick-actions {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+        }
+
+
+        @media (max-width: 600px) {
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-header h1 {
+                font-size: 27px;
+            }
+
+            .nav-links {
+                gap: 12px;
+            }
+
+            .nav-links a {
+                font-size: 13px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ==============================
+     NAVBAR
+     ============================== -->
+
+<nav class="navbar">
+
+    <div class="nav-container">
+
+        <div class="logo">
+            <a href="/">
+                TableTurn
+            </a>
+        </div>
+
+        <ul class="nav-links">
+
+            <li>
+                <a href="/">
+                    Home
+                </a>
+            </li>
+
+            <li>
+                <a href="/tables">
+                    Tables
+                </a>
+            </li>
+
+            <li>
+                <a href="/reservation">
+                    Reservations
+                </a>
+            </li>
+
+            <li>
+                <a href="/orders">
+                    Orders
+                </a>
+            </li>
+
+            <li>
+                <a href="/bills">
+                    Bills
+                </a>
+            </li>
+
+        </ul>
+
+    </div>
+
+</nav>
+
+
+<!-- ==============================
+     DASHBOARD
+     ============================== -->
+
+<section class="dashboard-page">
+
+    <div class="dashboard-container">
+
+
+        <!-- HEADER -->
+
+        <div class="dashboard-header">
+
+            <h1>
+                Restaurant Dashboard
+            </h1>
+
+            <p>
+                Overview of your restaurant
+                management system.
+            </p>
+
+        </div>
+
+
+        <!-- ==========================
+             STATISTICS
+             ========================== -->
+
+        <div class="stats-grid">
+
+
+            <!-- TABLES -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🪑
+                </div>
+
+                <h3>
+                    Total Tables
+                </h3>
+
+                <div
+                        class="stat-number"
+                        id="totalTables"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <!-- RESERVATIONS -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    📅
+                </div>
+
+                <h3>
+                    Total Reservations
+                </h3>
+
+                <div
+                        class="stat-number"
+                        id="totalReservations"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <!-- ORDERS -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🍽️
+                </div>
+
+                <h3>
+                    Total Orders
+                </h3>
+
+                <div
+                        class="stat-number"
+                        id="totalOrders"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <!-- BILLS -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🧾
+                </div>
+
+                <h3>
+                    Total Bills
+                </h3>
+
+                <div
+                        class="stat-number"
+                        id="totalBills"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- ==========================
+             QUICK ACTIONS
+             ========================== -->
+
+        <div class="section-card">
+
+            <h2>
+                Quick Actions
+            </h2>
+
+
+            <div class="quick-actions">
+
+
+                <a
+                        href="/tables"
+                        class="quick-action"
+                >
+
+                    <div class="quick-action-icon">
+                        🪑
+                    </div>
+
+                    <h3>
+                        Manage Tables
+                    </h3>
+
+                </a>
+
+
+                <a
+                        href="/reservation"
+                        class="quick-action"
+                >
+
+                    <div class="quick-action-icon">
+                        📅
+                    </div>
+
+                    <h3>
+                        New Reservation
+                    </h3>
+
+                </a>
+
+
+                <a
+                        href="/orders"
+                        class="quick-action"
+                >
+
+                    <div class="quick-action-icon">
+                        🍽️
+                    </div>
+
+                    <h3>
+                        Manage Orders
+                    </h3>
+
+                </a>
+
+
+                <a
+                        href="/bills"
+                        class="quick-action"
+                >
+
+                    <div class="quick-action-icon">
+                        🧾
+                    </div>
+
+                    <h3>
+                        Manage Bills
+                    </h3>
+
+                </a>
+
+
+            </div>
+
+        </div>
+
+
+        <!-- ==========================
+             TABLE STATUS
+             ========================== -->
+
+        <div class="section-card">
+
+            <h2>
+                Restaurant Table Status
+            </h2>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                    <tr>
+
+                        <th>
+                            ID
+                        </th>
+
+                        <th>
+                            Table Number
+                        </th>
+
+                        <th>
+                            Capacity
+                        </th>
+
+                        <th>
+                            Location
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                    </tr>
+
+                    </thead>
+
+
+                    <tbody id="dashboardTables">
+
+                    <tr>
+
+                        <td
+                                colspan="5"
+                                class="loading"
+                        >
+                            Loading tables...
+                        </td>
+
+                    </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- ==========================
+             RESERVATIONS
+             ========================== -->
+
+        <div class="section-card">
+
+            <h2>
+                Recent Reservations
+            </h2>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                    <tr>
+
+                        <th>
+                            ID
+                        </th>
+
+                        <th>
+                            Customer
+                        </th>
+
+                        <th>
+                            Date
+                        </th>
+
+                        <th>
+                            Time
+                        </th>
+
+                        <th>
+                            Guests
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                    </tr>
+
+                    </thead>
+
+
+                    <tbody
+                            id="reservationTableBody"
+                    >
+
+                    <tr>
+
+                        <td
+                                colspan="6"
+                                class="loading"
+                        >
+                            Loading reservations...
+                        </td>
+
+                    </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- ==========================
+             ORDERS
+             ========================== -->
+
+        <div class="section-card">
+
+            <h2>
+                Recent Orders
+            </h2>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                    <tr>
+
+                        <th>
+                            ID
+                        </th>
+
+                        <th>
+                            Customer
+                        </th>
+
+                        <th>
+                            Table
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Instructions
+                        </th>
+
+                    </tr>
+
+                    </thead>
+
+
+                    <tbody
+                            id="orderTableBody"
+                    >
+
+                    <tr>
+
+                        <td
+                                colspan="5"
+                                class="loading"
+                        >
+                            Loading orders...
+                        </td>
+
+                    </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+<!-- ==============================
+     FOOTER
+     ============================== -->
+
+<footer class="footer">
+
+    <h3>
+        TableTurn
+    </h3>
+
+    <p>
+        Smart Restaurant Table &
+        Reservation Management System
+    </p>
+
+    <p>
+        © 2026 TableTurn.
+        All Rights Reserved.
+    </p>
+
+</footer>
+
+
+<!-- ==============================
+     JAVASCRIPT
+     ============================== -->
+
+<script>
+
+
+    /* =================================
+       LOAD TABLES
+       ================================= */
+
+    async function loadDashboardTables() {
+
+        const tbody =
+            document.getElementById(
+                "dashboardTables"
+            );
+
+
+        try {
+
+            const response =
+                await fetch("/api/tables");
+
+
+            if (!response.ok) {
+                throw new Error(
+                    "Failed to load tables"
+                );
+            }
+
+
+            const tables =
+                await response.json();
+
+
+            document.getElementById(
+                "totalTables"
+            ).textContent =
+                tables.length;
+
+
+            tbody.innerHTML = "";
+
+
+            if (tables.length === 0) {
+
+                tbody.innerHTML = `
+                    <tr>
+                        <td
+                            colspan="5"
+                            class="empty"
+                        >
+                            No tables found.
+                        </td>
+                    </tr>
+                `;
+
+                return;
+            }
+
+
+            tables.forEach(function(table) {
+
+                const row =
+                    document.createElement("tr");
+
+
+                const status =
+                    table.status
+                        ? table.status.toLowerCase()
+                        : "available";
+
+
+                row.innerHTML = `
+
+                    <td>
+                        ${table.id}
+                    </td>
+
+                    <td>
+                        ${table.tableNumber}
+                    </td>
+
+                    <td>
+                        ${table.capacity}
+                    </td>
+
+                    <td>
+                        ${table.location || "-"}
+                    </td>
+
+                    <td>
+
+                        <span
+                            class="status ${status}"
+                        >
+                            ${table.status || "AVAILABLE"}
+                        </span>
+
+                    </td>
+
+                `;
+
+
+                tbody.appendChild(row);
+
+            });
+
+
+        } catch (error) {
+
+            console.error(error);
+
+
+            tbody.innerHTML = `
+                <tr>
+                    <td
+                        colspan="5"
+                        class="empty"
+                    >
+                        Unable to load tables.
+                    </td>
+                </tr>
+            `;
+
+        }
+
+    }
+
+
+    /* =================================
+       LOAD RESERVATIONS
+       ================================= */
+
+    async function loadReservations() {
+
+        const tbody =
+            document.getElementById(
+                "reservationTableBody"
+            );
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/reservations"
+                );
+
+
+            if (!response.ok) {
+                throw new Error(
+                    "Failed to load reservations"
+                );
+            }
+
+
+            const reservations =
+                await response.json();
+
+
+            document.getElementById(
+                "totalReservations"
+            ).textContent =
+                reservations.length;
+
+
+            tbody.innerHTML = "";
+
+
+            if (
+                reservations.length === 0
+            ) {
+
+                tbody.innerHTML = `
+                    <tr>
+                        <td
+                            colspan="6"
+                            class="empty"
+                        >
+                            No reservations found.
+                        </td>
+                    </tr>
+                `;
+
+                return;
+            }
+
+
+            /*
+             * Display latest records first
+             */
+
+            const recentReservations =
+                reservations
+                    .slice()
+                    .reverse()
+                    .slice(0, 10);
+
+
+            recentReservations.forEach(
+                function(reservation) {
+
+                    const row =
+                        document.createElement(
+                            "tr"
+                        );
+
+
+                    const status =
+                        reservation.status
+                            ? reservation.status
+                                .toLowerCase()
+                            : "pending";
+
+
+                    row.innerHTML = `
+
+                        <td>
+                            ${reservation.id}
+                        </td>
+
+                        <td>
+                            ${reservation.customerName || "-"}
+                        </td>
+
+                        <td>
+                            ${reservation.reservationDate || "-"}
+                        </td>
+
+                        <td>
+                            ${reservation.reservationTime || "-"}
+                        </td>
+
+                        <td>
+                            ${reservation.numberOfGuests || "-"}
+                        </td>
+
+                        <td>
+
+                            <span
+                                class="status ${status}"
+                            >
+                                ${reservation.status || "PENDING"}
+                            </span>
+
+                        </td>
+
+                    `;
+
+
+                    tbody.appendChild(row);
+
+                }
+            );
+
+
+        } catch (error) {
+
+            console.error(error);
+
+
+            tbody.innerHTML = `
+                <tr>
+                    <td
+                        colspan="6"
+                        class="empty"
+                    >
+                        Unable to load reservations.
+                    </td>
+                </tr>
+            `;
+
+        }
+
+    }
+
+
+    /* =================================
+       LOAD ORDERS
+       ================================= */
+
+    async function loadOrders() {
+
+        const tbody =
+            document.getElementById(
+                "orderTableBody"
+            );
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/orders"
+                );
+
+
+            if (!response.ok) {
+                throw new Error(
+                    "Failed to load orders"
+                );
+            }
+
+
+            const orders =
+                await response.json();
+
+
+            document.getElementById(
+                "totalOrders"
+            ).textContent =
+                orders.length;
+
+
+            tbody.innerHTML = "";
+
+
+            if (orders.length === 0) {
+
+                tbody.innerHTML = `
+                    <tr>
+                        <td
+                            colspan="5"
+                            class="empty"
+                        >
+                            No orders found.
+                        </td>
+                    </tr>
+                `;
+
+                return;
+            }
+
+
+            const recentOrders =
+                orders
+                    .slice()
+                    .reverse()
+                    .slice(0, 10);
+
+
+            recentOrders.forEach(
+                function(order) {
+
+                    const row =
+                        document.createElement(
+                            "tr"
+                        );
+
+
+                    const status =
+                        order.orderStatus
+                            ? order.orderStatus
+                                .toLowerCase()
+                            : "pending";
+
+
+                    row.innerHTML = `
+
+                        <td>
+                            ${order.id}
+                        </td>
+
+                        <td>
+                            ${order.customerName || "-"}
+                        </td>
+
+                        <td>
+                            ${order.tableId || "-"}
+                        </td>
+
+                        <td>
+
+                            <span
+                                class="status ${status}"
+                            >
+                                ${order.orderStatus || "PENDING"}
+                            </span>
+
+                        </td>
+
+                        <td>
+                            ${order.specialInstructions || "-"}
+                        </td>
+
+                    `;
+
+
+                    tbody.appendChild(row);
+
+                }
+            );
+
+
+        } catch (error) {
+
+            console.error(error);
+
+
+            tbody.innerHTML = `
+                <tr>
+                    <td
+                        colspan="5"
+                        class="empty"
+                    >
+                        Unable to load orders.
+                    </td>
+                </tr>
+            `;
+
+        }
+
+    }
+
+
+    /* =================================
+       LOAD BILLS
+       ================================= */
+
+    async function loadBills() {
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/bills"
+                );
+
+
+            if (!response.ok) {
+                throw new Error(
+                    "Failed to load bills"
+                );
+            }
+
+
+            const bills =
+                await response.json();
+
+
+            document.getElementById(
+                "totalBills"
+            ).textContent =
+                bills.length;
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            document.getElementById(
+                "totalBills"
+            ).textContent = "0";
+
+        }
+
+    }
+
+
+    /* =================================
+       LOAD EVERYTHING
+       ================================= */
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function() {
+
+            loadDashboardTables();
+
+            loadReservations();
+
+            loadOrders();
+
+            loadBills();
+
+        }
+    );
+
+
+</script>
+
+
+</body>
+
+</html>

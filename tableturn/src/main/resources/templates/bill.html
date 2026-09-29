@@ -1,0 +1,1931 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Bills - TableTurn</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f5f6fa;
+            color: #222;
+        }
+
+        /* ================= NAVBAR ================= */
+
+        nav {
+            background: #111827;
+            color: white;
+
+            padding: 16px 40px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+            color: #f59e0b;
+        }
+
+        nav ul {
+            list-style: none;
+
+            display: flex;
+            gap: 25px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 15px;
+
+            transition: 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: #f59e0b;
+        }
+
+        /* ================= HEADER ================= */
+
+        .page-header {
+            background:
+                    linear-gradient(
+                            135deg,
+                            #111827,
+                            #374151
+                    );
+
+            color: white;
+
+            padding: 50px 20px;
+
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 38px;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: #d1d5db;
+        }
+
+        /* ================= MAIN ================= */
+
+        .container {
+            width: 90%;
+            max-width: 1250px;
+
+            margin: 40px auto;
+        }
+
+        .grid {
+            display: grid;
+
+            grid-template-columns:
+                1fr 1.7fr;
+
+            gap: 30px;
+        }
+
+        /* ================= CARD ================= */
+
+        .card {
+            background: white;
+
+            padding: 30px;
+
+            border-radius: 12px;
+
+            box-shadow:
+                    0 4px 15px
+                    rgba(0, 0, 0, 0.08);
+        }
+
+        .card h2 {
+            margin-bottom: 25px;
+            color: #111827;
+        }
+
+        /* ================= FORM ================= */
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+
+            margin-bottom: 7px;
+
+            font-weight: bold;
+
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+
+            width: 100%;
+
+            padding: 12px;
+
+            border:
+                    1px solid #d1d5db;
+
+            border-radius: 7px;
+
+            outline: none;
+
+            font-size: 14px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+
+            border-color: #f59e0b;
+        }
+
+        /* ================= CALCULATION ================= */
+
+        .calculation-box {
+
+            background: #f9fafb;
+
+            border:
+                    1px solid #e5e7eb;
+
+            border-radius: 8px;
+
+            padding: 18px;
+
+            margin-bottom: 20px;
+        }
+
+        .calculation-row {
+
+            display: flex;
+
+            justify-content:
+                    space-between;
+
+            padding: 8px 0;
+
+            font-size: 14px;
+        }
+
+        .calculation-row.total {
+
+            border-top:
+                    2px solid #111827;
+
+            margin-top: 10px;
+
+            padding-top: 15px;
+
+            font-size: 19px;
+
+            font-weight: bold;
+        }
+
+        /* ================= BUTTON ================= */
+
+        .btn {
+
+            width: 100%;
+
+            padding: 13px;
+
+            border: none;
+
+            border-radius: 7px;
+
+            background: #f59e0b;
+
+            color: white;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: #d97706;
+        }
+
+        /* ================= TABLE ================= */
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+        }
+
+        table th {
+
+            background: #111827;
+
+            color: white;
+
+            padding: 13px;
+
+            text-align: left;
+
+            font-size: 13px;
+
+            white-space: nowrap;
+        }
+
+        table td {
+
+            padding: 13px;
+
+            border-bottom:
+                    1px solid #e5e7eb;
+
+            font-size: 13px;
+        }
+
+        table tr:hover {
+            background: #f9fafb;
+        }
+
+        /* ================= STATUS ================= */
+
+        .status {
+
+            padding: 5px 10px;
+
+            border-radius: 20px;
+
+            font-size: 11px;
+
+            font-weight: bold;
+
+            display: inline-block;
+        }
+
+        .paid {
+
+            background: #dcfce7;
+
+            color: #166534;
+        }
+
+        .unpaid {
+
+            background: #fef3c7;
+
+            color: #92400e;
+        }
+
+        .pending {
+
+            background: #dbeafe;
+
+            color: #1e40af;
+        }
+
+        .failed {
+
+            background: #fee2e2;
+
+            color: #991b1b;
+        }
+
+        /* ================= PAYMENT ================= */
+
+        .cash {
+            color: #166534;
+            font-weight: bold;
+        }
+
+        .card {
+            color: #1d4ed8;
+            font-weight: bold;
+        }
+
+        .upi {
+            color: #7c3aed;
+            font-weight: bold;
+        }
+
+        /* ================= ACTION BUTTONS ================= */
+
+        .action-btn {
+
+            padding: 6px 10px;
+
+            border: none;
+
+            border-radius: 5px;
+
+            cursor: pointer;
+
+            color: white;
+
+            font-size: 11px;
+
+            margin: 2px;
+
+            transition: 0.2s;
+        }
+
+        .action-btn:hover {
+            opacity: 0.8;
+        }
+
+        .paid-btn {
+            background: #16a34a;
+        }
+
+        .delete-btn {
+            background: #dc2626;
+        }
+
+        .print-btn {
+            background: #2563eb;
+        }
+
+        /* ================= MESSAGE ================= */
+
+        .message {
+
+            padding: 12px;
+
+            margin-bottom: 20px;
+
+            border-radius: 7px;
+
+            display: none;
+
+            font-weight: bold;
+        }
+
+        .success {
+
+            background: #dcfce7;
+
+            color: #166534;
+        }
+
+        .error {
+
+            background: #fee2e2;
+
+            color: #991b1b;
+        }
+
+        /* ================= FOOTER ================= */
+
+        footer {
+
+            margin-top: 60px;
+
+            background: #111827;
+
+            color: #d1d5db;
+
+            text-align: center;
+
+            padding: 25px;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 1000px) {
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        @media (max-width: 700px) {
+
+            nav {
+
+                flex-direction: column;
+
+                gap: 15px;
+            }
+
+            nav ul {
+
+                flex-wrap: wrap;
+
+                justify-content: center;
+
+                gap: 12px;
+            }
+
+            .container {
+                width: 95%;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ================= NAVBAR ================= -->
+
+<nav>
+
+    <div class="logo">
+        🍽️ TableTurn
+    </div>
+
+    <ul>
+
+        <li>
+            <a href="/">Home</a>
+        </li>
+
+        <li>
+            <a href="/dashboard">Dashboard</a>
+        </li>
+
+        <li>
+            <a href="/tables">Tables</a>
+        </li>
+
+        <li>
+            <a href="/reservation">Reservations</a>
+        </li>
+
+        <li>
+            <a href="/orders">Orders</a>
+        </li>
+
+        <li>
+            <a href="/bills">Bills</a>
+        </li>
+
+    </ul>
+
+</nav>
+
+
+<!-- ================= PAGE HEADER ================= -->
+
+<section class="page-header">
+
+    <h1>Billing & Payments</h1>
+
+    <p>
+        Create bills and manage restaurant payments
+    </p>
+
+</section>
+
+
+<!-- ================= MAIN ================= -->
+
+<div class="container">
+
+
+    <div id="message"
+         class="message">
+    </div>
+
+
+    <div class="grid">
+
+
+        <!-- ================= CREATE BILL ================= -->
+
+        <div class="card">
+
+            <h2>🧾 Create Bill</h2>
+
+
+            <form id="billForm">
+
+
+                <div class="form-group">
+
+                    <label for="orderId">
+                        Order ID
+                    </label>
+
+                    <input
+                            type="number"
+                            id="orderId"
+                            placeholder="Enter order ID"
+                            required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="subtotal">
+                        Subtotal (₹)
+                    </label>
+
+                    <input
+                            type="number"
+                            id="subtotal"
+                            min="0"
+                            step="0.01"
+                            placeholder="Enter subtotal"
+                            required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="tax">
+                        Tax (₹)
+                    </label>
+
+                    <input
+                            type="number"
+                            id="tax"
+                            min="0"
+                            step="0.01"
+                            value="0"
+                            placeholder="Enter tax"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="discount">
+                        Discount (₹)
+                    </label>
+
+                    <input
+                            type="number"
+                            id="discount"
+                            min="0"
+                            step="0.01"
+                            value="0"
+                            placeholder="Enter discount"
+                    >
+
+                </div>
+
+
+                <!-- CALCULATION -->
+
+                <div class="calculation-box">
+
+                    <div class="calculation-row">
+
+                        <span>
+                            Subtotal
+                        </span>
+
+                        <span>
+                            ₹<span id="displaySubtotal">
+                                0.00
+                            </span>
+                        </span>
+
+                    </div>
+
+
+                    <div class="calculation-row">
+
+                        <span>
+                            Tax
+                        </span>
+
+                        <span>
+                            ₹<span id="displayTax">
+                                0.00
+                            </span>
+                        </span>
+
+                    </div>
+
+
+                    <div class="calculation-row">
+
+                        <span>
+                            Discount
+                        </span>
+
+                        <span>
+                            - ₹<span id="displayDiscount">
+                                0.00
+                            </span>
+                        </span>
+
+                    </div>
+
+
+                    <div class="calculation-row total">
+
+                        <span>
+                            Total
+                        </span>
+
+                        <span>
+                            ₹<span id="displayTotal">
+                                0.00
+                            </span>
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="paymentMethod">
+                        Payment Method
+                    </label>
+
+                    <select id="paymentMethod"
+                            required>
+
+                        <option value="">
+                            -- Select Payment Method --
+                        </option>
+
+                        <option value="CASH">
+                            Cash
+                        </option>
+
+                        <option value="CARD">
+                            Card
+                        </option>
+
+                        <option value="UPI">
+                            UPI
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="paymentStatus">
+                        Payment Status
+                    </label>
+
+                    <select id="paymentStatus">
+
+                        <option value="PENDING">
+                            Pending
+                        </option>
+
+                        <option value="PAID">
+                            Paid
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <button
+                        type="submit"
+                        class="btn">
+
+                    Create Bill
+
+                </button>
+
+
+            </form>
+
+        </div>
+
+
+        <!-- ================= BILL LIST ================= -->
+
+        <div class="card">
+
+            <h2>📋 Bill List</h2>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                    <tr>
+
+                        <th>ID</th>
+
+                        <th>Order</th>
+
+                        <th>Subtotal</th>
+
+                        <th>Tax</th>
+
+                        <th>Discount</th>
+
+                        <th>Total</th>
+
+                        <th>Payment</th>
+
+                        <th>Status</th>
+
+                        <th>Actions</th>
+
+                    </tr>
+
+                    </thead>
+
+
+                    <tbody id="billTableBody">
+
+                    <tr>
+
+                        <td
+                                colspan="9"
+                                style="
+                                text-align:center;
+                                padding:30px;
+                                ">
+
+                            Loading bills...
+
+                        </td>
+
+                    </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+
+    <p>
+        © 2026 TableTurn Restaurant Management System
+    </p>
+
+</footer>
+
+
+<script>
+
+
+    /* =========================================
+       API URL
+    ========================================= */
+
+    const BILL_API_URL =
+        "/api/bills";
+
+
+    /* =========================================
+       PAGE LOAD
+    ========================================= */
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            loadBills();
+
+            calculateTotal();
+
+        }
+    );
+
+
+    /* =========================================
+       CALCULATION INPUTS
+    ========================================= */
+
+    document
+        .getElementById("subtotal")
+        .addEventListener(
+            "input",
+            calculateTotal
+        );
+
+
+    document
+        .getElementById("tax")
+        .addEventListener(
+            "input",
+            calculateTotal
+        );
+
+
+    document
+        .getElementById("discount")
+        .addEventListener(
+            "input",
+            calculateTotal
+        );
+
+
+    /* =========================================
+       CALCULATE BILL TOTAL
+    ========================================= */
+
+    function calculateTotal() {
+
+        const subtotal =
+            Number(
+                document.getElementById(
+                    "subtotal"
+                ).value
+            ) || 0;
+
+
+        const tax =
+            Number(
+                document.getElementById(
+                    "tax"
+                ).value
+            ) || 0;
+
+
+        const discount =
+            Number(
+                document.getElementById(
+                    "discount"
+                ).value
+            ) || 0;
+
+
+        let total =
+            subtotal +
+            tax -
+            discount;
+
+
+        /*
+         * Prevent negative bill.
+         */
+
+        if (total < 0) {
+
+            total = 0;
+
+        }
+
+
+        document.getElementById(
+            "displaySubtotal"
+        ).textContent =
+            subtotal.toFixed(2);
+
+
+        document.getElementById(
+            "displayTax"
+        ).textContent =
+            tax.toFixed(2);
+
+
+        document.getElementById(
+            "displayDiscount"
+        ).textContent =
+            discount.toFixed(2);
+
+
+        document.getElementById(
+            "displayTotal"
+        ).textContent =
+            total.toFixed(2);
+
+    }
+
+
+    /* =========================================
+       CREATE BILL
+    ========================================= */
+
+    document
+        .getElementById("billForm")
+        .addEventListener(
+            "submit",
+            async function (event) {
+
+                event.preventDefault();
+
+
+                const subtotal =
+                    Number(
+                        document.getElementById(
+                            "subtotal"
+                        ).value
+                    );
+
+
+                const tax =
+                    Number(
+                        document.getElementById(
+                            "tax"
+                        ).value
+                    ) || 0;
+
+
+                const discount =
+                    Number(
+                        document.getElementById(
+                            "discount"
+                        ).value
+                    ) || 0;
+
+
+                let totalAmount =
+                    subtotal +
+                    tax -
+                    discount;
+
+
+                if (totalAmount < 0) {
+
+                    totalAmount = 0;
+
+                }
+
+
+                const bill = {
+
+                    orderId:
+                        Number(
+                            document.getElementById(
+                                "orderId"
+                            ).value
+                        ),
+
+                    subtotal:
+                    subtotal,
+
+                    tax:
+                    tax,
+
+                    discount:
+                    discount,
+
+                    totalAmount:
+                    totalAmount,
+
+                    paymentMethod:
+                    document.getElementById(
+                        "paymentMethod"
+                    ).value,
+
+                    paymentStatus:
+                    document.getElementById(
+                        "paymentStatus"
+                    ).value
+
+                };
+
+
+                try {
+
+                    const response =
+                        await fetch(
+                            BILL_API_URL,
+                            {
+
+                                method: "POST",
+
+                                headers: {
+
+                                    "Content-Type":
+                                        "application/json"
+
+                                },
+
+                                body:
+                                    JSON.stringify(
+                                        bill
+                                    )
+
+                            }
+                        );
+
+
+                    if (!response.ok) {
+
+                        const errorText =
+                            await response.text();
+
+                        throw new Error(
+                            errorText ||
+                            "Failed to create bill"
+                        );
+
+                    }
+
+
+                    showMessage(
+                        "Bill created successfully!",
+                        "success"
+                    );
+
+
+                    document
+                        .getElementById(
+                            "billForm"
+                        )
+                        .reset();
+
+
+                    calculateTotal();
+
+                    loadBills();
+
+
+                } catch (error) {
+
+                    console.error(error);
+
+                    showMessage(
+                        "Failed to create bill.",
+                        "error"
+                    );
+
+                }
+
+            }
+        );
+
+
+    /* =========================================
+       LOAD BILLS
+    ========================================= */
+
+    async function loadBills() {
+
+        try {
+
+            const response =
+                await fetch(
+                    BILL_API_URL
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Failed to load bills"
+                );
+
+            }
+
+
+            const bills =
+                await response.json();
+
+
+            displayBills(bills);
+
+
+        } catch (error) {
+
+            console.error(error);
+
+
+            document.getElementById(
+                "billTableBody"
+            ).innerHTML = `
+
+                <tr>
+
+                    <td
+                        colspan="9"
+                        style="
+                        text-align:center;
+                        color:red;
+                        ">
+
+                        Unable to load bills.
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        }
+
+    }
+
+
+    /* =========================================
+       DISPLAY BILLS
+    ========================================= */
+
+    function displayBills(bills) {
+
+        const tbody =
+            document.getElementById(
+                "billTableBody"
+            );
+
+
+        if (
+            !bills ||
+            bills.length === 0
+        ) {
+
+            tbody.innerHTML = `
+
+                <tr>
+
+                    <td
+                        colspan="9"
+                        style="
+                        text-align:center;
+                        padding:30px;
+                        ">
+
+                        No bills found.
+
+                    </td>
+
+                </tr>
+
+            `;
+
+            return;
+
+        }
+
+
+        tbody.innerHTML = "";
+
+
+        bills.forEach(
+            function (bill) {
+
+                const row =
+                    document.createElement(
+                        "tr"
+                    );
+
+
+                const status =
+                    bill.paymentStatus ||
+                    "PENDING";
+
+
+                const method =
+                    bill.paymentMethod ||
+                    "-";
+
+
+                row.innerHTML = `
+
+                    <td>
+                        ${bill.id}
+                    </td>
+
+                    <td>
+                        ${bill.orderId || "-"}
+                    </td>
+
+                    <td>
+                        ₹${formatMoney(
+                    bill.subtotal
+                )}
+                    </td>
+
+                    <td>
+                        ₹${formatMoney(
+                    bill.tax
+                )}
+                    </td>
+
+                    <td>
+                        ₹${formatMoney(
+                    bill.discount
+                )}
+                    </td>
+
+                    <td>
+                        <strong>
+                            ₹${formatMoney(
+                    bill.totalAmount
+                )}
+                        </strong>
+                    </td>
+
+                    <td>
+
+                        <span
+                            class="${getPaymentMethodClass(
+                    method
+                )}">
+
+                            ${method}
+
+                        </span>
+
+                    </td>
+
+                    <td>
+
+                        <span
+                            class="status
+                            ${getPaymentStatusClass(
+                    status
+                )}">
+
+                            ${status}
+
+                        </span>
+
+                    </td>
+
+                    <td>
+
+                        ${
+                    String(status)
+                        .toUpperCase()
+                    !== "PAID"
+                        ?
+                        `
+                            <button
+                                class="action-btn paid-btn"
+                                onclick="
+                                    markAsPaid(
+                                        ${bill.id}
+                                    )
+                                ">
+
+                                Mark Paid
+
+                            </button>
+                            `
+                        :
+                        ""
+                }
+
+
+                        <button
+                            class="action-btn print-btn"
+                            onclick="
+                                printBill(
+                                    ${bill.id}
+                                )
+                            ">
+
+                            Print
+
+                        </button>
+
+
+                        <button
+                            class="action-btn delete-btn"
+                            onclick="
+                                deleteBill(
+                                    ${bill.id}
+                                )
+                            ">
+
+                            Delete
+
+                        </button>
+
+                    </td>
+
+                `;
+
+
+                tbody.appendChild(row);
+
+            }
+        );
+
+    }
+
+
+    /* =========================================
+       MARK BILL AS PAID
+    ========================================= */
+
+    async function markAsPaid(id) {
+
+        try {
+
+            /*
+             * Get current bill first.
+             */
+
+            const getResponse =
+                await fetch(
+                    BILL_API_URL +
+                    "/" +
+                    id
+                );
+
+
+            if (!getResponse.ok) {
+
+                throw new Error(
+                    "Bill not found"
+                );
+
+            }
+
+
+            const bill =
+                await getResponse.json();
+
+
+            bill.paymentStatus =
+                "PAID";
+
+
+            const response =
+                await fetch(
+                    BILL_API_URL +
+                    "/" +
+                    id,
+                    {
+
+                        method: "PUT",
+
+                        headers: {
+
+                            "Content-Type":
+                                "application/json"
+
+                        },
+
+                        body:
+                            JSON.stringify(
+                                bill
+                            )
+
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Failed to update bill"
+                );
+
+            }
+
+
+            showMessage(
+                "Bill marked as paid.",
+                "success"
+            );
+
+
+            loadBills();
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            showMessage(
+                "Unable to update payment status.",
+                "error"
+            );
+
+        }
+
+    }
+
+
+    /* =========================================
+       DELETE BILL
+    ========================================= */
+
+    async function deleteBill(id) {
+
+        const confirmed =
+            confirm(
+                "Are you sure you want to delete this bill?"
+            );
+
+
+        if (!confirmed) {
+
+            return;
+
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    BILL_API_URL +
+                    "/" +
+                    id,
+                    {
+
+                        method: "DELETE"
+
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Failed to delete bill"
+                );
+
+            }
+
+
+            showMessage(
+                "Bill deleted successfully.",
+                "success"
+            );
+
+
+            loadBills();
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            showMessage(
+                "Unable to delete bill.",
+                "error"
+            );
+
+        }
+
+    }
+
+
+    /* =========================================
+       PRINT BILL
+    ========================================= */
+
+    async function printBill(id) {
+
+        try {
+
+            const response =
+                await fetch(
+                    BILL_API_URL +
+                    "/" +
+                    id
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Bill not found"
+                );
+
+            }
+
+
+            const bill =
+                await response.json();
+
+
+            const printWindow =
+                window.open(
+                    "",
+                    "_blank",
+                    "width=700,height=700"
+                );
+
+
+            printWindow.document.write(`
+
+                <!DOCTYPE html>
+
+                <html>
+
+                <head>
+
+                    <title>
+                        TableTurn Bill #${bill.id}
+                    </title>
+
+                    <style>
+
+                        body {
+
+                            font-family: Arial;
+
+                            padding: 40px;
+
+                        }
+
+                        .invoice {
+
+                            max-width: 600px;
+
+                            margin: auto;
+
+                            border:
+                                1px solid #ddd;
+
+                            padding: 30px;
+
+                        }
+
+                        h1 {
+
+                            text-align: center;
+
+                        }
+
+                        .line {
+
+                            display: flex;
+
+                            justify-content:
+                                space-between;
+
+                            padding: 10px 0;
+
+                        }
+
+                        .total {
+
+                            border-top:
+                                2px solid #000;
+
+                            font-size: 20px;
+
+                            font-weight: bold;
+
+                            padding-top: 15px;
+
+                        }
+
+                        .center {
+
+                            text-align: center;
+
+                        }
+
+                    </style>
+
+                </head>
+
+                <body>
+
+                    <div class="invoice">
+
+                        <h1>
+                            🍽️ TableTurn
+                        </h1>
+
+                        <p class="center">
+                            Restaurant Management System
+                        </p>
+
+                        <hr>
+
+                        <div class="line">
+
+                            <span>
+                                Bill ID
+                            </span>
+
+                            <span>
+                                #${bill.id}
+                            </span>
+
+                        </div>
+
+                        <div class="line">
+
+                            <span>
+                                Order ID
+                            </span>
+
+                            <span>
+                                #${bill.orderId}
+                            </span>
+
+                        </div>
+
+                        <hr>
+
+                        <div class="line">
+
+                            <span>
+                                Subtotal
+                            </span>
+
+                            <span>
+                                ₹${formatMoney(
+                bill.subtotal
+            )}
+                            </span>
+
+                        </div>
+
+                        <div class="line">
+
+                            <span>
+                                Tax
+                            </span>
+
+                            <span>
+                                ₹${formatMoney(
+                bill.tax
+            )}
+                            </span>
+
+                        </div>
+
+                        <div class="line">
+
+                            <span>
+                                Discount
+                            </span>
+
+                            <span>
+                                - ₹${formatMoney(
+                bill.discount
+            )}
+                            </span>
+
+                        </div>
+
+                        <div class="line total">
+
+                            <span>
+                                Total
+                            </span>
+
+                            <span>
+                                ₹${formatMoney(
+                bill.totalAmount
+            )}
+                            </span>
+
+                        </div>
+
+                        <hr>
+
+                        <div class="line">
+
+                            <span>
+                                Payment Method
+                            </span>
+
+                            <span>
+                                ${bill.paymentMethod}
+                            </span>
+
+                        </div>
+
+                        <div class="line">
+
+                            <span>
+                                Payment Status
+                            </span>
+
+                            <span>
+                                ${bill.paymentStatus}
+                            </span>
+
+                        </div>
+
+                        <br>
+
+                        <p class="center">
+                            Thank you for dining with us!
+                        </p>
+
+                    </div>
+
+                    <script>
+
+                        window.onload = function () {
+
+                            window.print();
+
+                        };
+
+                    <\/script>
+
+                </body>
+
+                </html>
+
+            `);
+
+
+            printWindow.document.close();
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            showMessage(
+                "Unable to print bill.",
+                "error"
+            );
+
+        }
+
+    }
+
+
+    /* =========================================
+       FORMAT MONEY
+    ========================================= */
+
+    function formatMoney(value) {
+
+        return Number(
+            value || 0
+        ).toFixed(2);
+
+    }
+
+
+    /* =========================================
+       PAYMENT METHOD CLASS
+    ========================================= */
+
+    function getPaymentMethodClass(
+        method
+    ) {
+
+        const value =
+            String(method)
+                .toUpperCase();
+
+
+        if (value === "CASH") {
+
+            return "cash";
+
+        }
+
+
+        if (value === "CARD") {
+
+            return "card";
+
+        }
+
+
+        if (value === "UPI") {
+
+            return "upi";
+
+        }
+
+
+        return "";
+
+    }
+
+
+    /* =========================================
+       PAYMENT STATUS CLASS
+    ========================================= */
+
+    function getPaymentStatusClass(
+        status
+    ) {
+
+        const value =
+            String(status)
+                .toUpperCase();
+
+
+        if (value === "PAID") {
+
+            return "paid";
+
+        }
+
+
+        if (value === "FAILED") {
+
+            return "failed";
+
+        }
+
+
+        if (value === "PENDING") {
+
+            return "pending";
+
+        }
+
+
+        return "unpaid";
+
+    }
+
+
+    /* =========================================
+       SHOW MESSAGE
+    ========================================= */
+
+    function showMessage(
+        message,
+        type
+    ) {
+
+        const element =
+            document.getElementById(
+                "message"
+            );
+
+
+        element.textContent =
+            message;
+
+
+        element.className =
+            "message " + type;
+
+
+        element.style.display =
+            "block";
+
+
+        setTimeout(
+            function () {
+
+                element.style.display =
+                    "none";
+
+            },
+            4000
+        );
+
+    }
+
+</script>
+
+
+</body>
+
+</html>

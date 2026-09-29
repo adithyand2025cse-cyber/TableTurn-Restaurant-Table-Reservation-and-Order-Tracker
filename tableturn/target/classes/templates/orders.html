@@ -1,0 +1,2103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Orders - TableTurn</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f5f6fa;
+            color: #222;
+        }
+
+        /* ================= NAVBAR ================= */
+
+        nav {
+            background: #111827;
+            color: white;
+            padding: 16px 40px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+            color: #f59e0b;
+        }
+
+        nav ul {
+            list-style: none;
+
+            display: flex;
+            gap: 25px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 15px;
+
+            transition: 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: #f59e0b;
+        }
+
+        /* ================= HEADER ================= */
+
+        .page-header {
+            background:
+                    linear-gradient(
+                            135deg,
+                            #111827,
+                            #374151
+                    );
+
+            color: white;
+
+            padding: 50px 20px;
+
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 38px;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: #d1d5db;
+        }
+
+        /* ================= MAIN ================= */
+
+        .container {
+            width: 90%;
+            max-width: 1250px;
+
+            margin: 40px auto;
+        }
+
+        .grid {
+            display: grid;
+
+            grid-template-columns:
+                1fr 1.7fr;
+
+            gap: 30px;
+        }
+
+        /* ================= CARD ================= */
+
+        .card {
+            background: white;
+
+            padding: 30px;
+
+            border-radius: 12px;
+
+            box-shadow:
+                    0 4px 15px
+                    rgba(0, 0, 0, 0.08);
+        }
+
+        .card h2 {
+            margin-bottom: 25px;
+            color: #111827;
+        }
+
+        /* ================= FORM ================= */
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+
+            margin-bottom: 7px;
+
+            font-weight: bold;
+
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+
+            width: 100%;
+
+            padding: 12px;
+
+            border:
+                    1px solid #d1d5db;
+
+            border-radius: 7px;
+
+            outline: none;
+
+            font-size: 14px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+
+            border-color: #f59e0b;
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        /* ================= BUTTON ================= */
+
+        .btn {
+            width: 100%;
+
+            padding: 13px;
+
+            border: none;
+
+            border-radius: 7px;
+
+            background: #f59e0b;
+
+            color: white;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: #d97706;
+        }
+
+        /* ================= TABLE ================= */
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th {
+
+            background: #111827;
+
+            color: white;
+
+            padding: 13px;
+
+            text-align: left;
+
+            font-size: 13px;
+
+            white-space: nowrap;
+        }
+
+        table td {
+
+            padding: 13px;
+
+            border-bottom:
+                    1px solid #e5e7eb;
+
+            font-size: 13px;
+
+            vertical-align: middle;
+        }
+
+        table tr:hover {
+            background: #f9fafb;
+        }
+
+        /* ================= STATUS ================= */
+
+        .status {
+
+            padding: 5px 10px;
+
+            border-radius: 20px;
+
+            font-size: 11px;
+
+            font-weight: bold;
+
+            display: inline-block;
+        }
+
+        .pending {
+
+            background: #fef3c7;
+
+            color: #92400e;
+        }
+
+        .confirmed {
+
+            background: #dcfce7;
+
+            color: #166534;
+        }
+
+        .preparing {
+
+            background: #dbeafe;
+
+            color: #1e40af;
+        }
+
+        .ready {
+
+            background: #ede9fe;
+
+            color: #5b21b6;
+        }
+
+        .completed {
+
+            background: #d1fae5;
+
+            color: #065f46;
+        }
+
+        .cancelled {
+
+            background: #fee2e2;
+
+            color: #991b1b;
+        }
+
+        /* ================= ACTION BUTTONS ================= */
+
+        .action-btn {
+
+            padding: 6px 10px;
+
+            border: none;
+
+            border-radius: 5px;
+
+            cursor: pointer;
+
+            color: white;
+
+            font-size: 11px;
+
+            margin: 2px;
+
+            transition: 0.2s;
+        }
+
+        .action-btn:hover {
+            opacity: 0.8;
+        }
+
+        .confirm-btn {
+            background: #16a34a;
+        }
+
+        .preparing-btn {
+            background: #2563eb;
+        }
+
+        .ready-btn {
+            background: #7c3aed;
+        }
+
+        .complete-btn {
+            background: #059669;
+        }
+
+        .cancel-btn {
+            background: #dc2626;
+        }
+
+        .delete-btn {
+            background: #6b7280;
+        }
+
+        /* ================= MESSAGE ================= */
+
+        .message {
+
+            padding: 12px;
+
+            margin-bottom: 20px;
+
+            border-radius: 7px;
+
+            display: none;
+
+            font-weight: bold;
+        }
+
+        .success {
+
+            background: #dcfce7;
+
+            color: #166534;
+        }
+
+        .error {
+
+            background: #fee2e2;
+
+            color: #991b1b;
+        }
+
+        /* ================= ORDER ITEMS ================= */
+
+        .items-section {
+
+            border:
+                    1px solid #e5e7eb;
+
+            padding: 15px;
+
+            border-radius: 8px;
+
+            margin-bottom: 20px;
+
+            background: #fafafa;
+        }
+
+        .items-header {
+
+            display: flex;
+
+            justify-content:
+                    space-between;
+
+            align-items: center;
+
+            margin-bottom: 15px;
+        }
+
+        .items-header h3 {
+            font-size: 16px;
+        }
+
+        .add-item-btn {
+
+            background: #111827;
+
+            color: white;
+
+            border: none;
+
+            padding: 7px 12px;
+
+            border-radius: 5px;
+
+            cursor: pointer;
+        }
+
+        .add-item-btn:hover {
+            background: #374151;
+        }
+
+        .item-row {
+
+            display: grid;
+
+            grid-template-columns:
+                1.5fr 0.7fr 1fr auto;
+
+            gap: 8px;
+
+            margin-bottom: 8px;
+        }
+
+        .item-row input {
+
+            width: 100%;
+
+            padding: 9px;
+
+            border:
+                    1px solid #d1d5db;
+
+            border-radius: 5px;
+        }
+
+        .remove-item-btn {
+
+            border: none;
+
+            background: #dc2626;
+
+            color: white;
+
+            padding: 8px 10px;
+
+            border-radius: 5px;
+
+            cursor: pointer;
+        }
+
+        /* ================= TOTAL ================= */
+
+        .order-total {
+
+            text-align: right;
+
+            font-size: 18px;
+
+            font-weight: bold;
+
+            margin-top: 15px;
+
+            color: #111827;
+        }
+
+        /* ================= FOOTER ================= */
+
+        footer {
+
+            margin-top: 60px;
+
+            background: #111827;
+
+            color: #d1d5db;
+
+            text-align: center;
+
+            padding: 25px;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 1000px) {
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        @media (max-width: 700px) {
+
+            nav {
+
+                flex-direction: column;
+
+                gap: 15px;
+
+            }
+
+            nav ul {
+
+                flex-wrap: wrap;
+
+                justify-content: center;
+
+                gap: 12px;
+
+            }
+
+            .container {
+                width: 95%;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .item-row {
+
+                grid-template-columns:
+                    1fr 1fr;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ================= NAVBAR ================= -->
+
+<nav>
+
+    <div class="logo">
+        🍽️ TableTurn
+    </div>
+
+    <ul>
+
+        <li>
+            <a href="/">Home</a>
+        </li>
+
+        <li>
+            <a href="/dashboard">Dashboard</a>
+        </li>
+
+        <li>
+            <a href="/tables">Tables</a>
+        </li>
+
+        <li>
+            <a href="/reservation">Reservations</a>
+        </li>
+
+        <li>
+            <a href="/orders">Orders</a>
+        </li>
+
+        <li>
+            <a href="/bills">Bills</a>
+        </li>
+
+    </ul>
+
+</nav>
+
+
+<!-- ================= PAGE HEADER ================= -->
+
+<section class="page-header">
+
+    <h1>Order Management</h1>
+
+    <p>
+        Create and manage restaurant orders
+    </p>
+
+</section>
+
+
+<!-- ================= MAIN ================= -->
+
+<div class="container">
+
+
+    <div id="message"
+         class="message">
+    </div>
+
+
+    <div class="grid">
+
+
+        <!-- ================= CREATE ORDER ================= -->
+
+        <div class="card">
+
+            <h2>➕ Create Order</h2>
+
+
+            <form id="orderForm">
+
+
+                <div class="form-group">
+
+                    <label for="reservationId">
+                        Reservation ID
+                    </label>
+
+                    <input
+                            type="number"
+                            id="reservationId"
+                            placeholder="Optional"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="tableId">
+                        Table
+                    </label>
+
+                    <select
+                            id="tableId"
+                            required>
+
+                        <option value="">
+                            -- Select Table --
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="customerName">
+                        Customer Name
+                    </label>
+
+                    <input
+                            type="text"
+                            id="customerName"
+                            placeholder="Enter customer name"
+                            required
+                    >
+
+                </div>
+
+
+                <!-- ORDER ITEMS -->
+
+                <div class="items-section">
+
+                    <div class="items-header">
+
+                        <h3>
+                            Order Items
+                        </h3>
+
+                        <button
+                                type="button"
+                                class="add-item-btn"
+                                onclick="addItem()">
+
+                            + Add Item
+
+                        </button>
+
+                    </div>
+
+
+                    <div id="itemsContainer">
+
+
+                        <div class="item-row">
+
+                            <input
+                                    type="text"
+                                    class="item-name"
+                                    placeholder="Item name"
+                                    required
+                            >
+
+                            <input
+                                    type="number"
+                                    class="item-quantity"
+                                    placeholder="Qty"
+                                    min="1"
+                                    value="1"
+                                    required
+                            >
+
+                            <input
+                                    type="number"
+                                    class="item-price"
+                                    placeholder="Price"
+                                    min="0"
+                                    step="0.01"
+                                    required
+                            >
+
+                            <button
+                                    type="button"
+                                    class="remove-item-btn"
+                                    onclick="removeItem(this)">
+
+                                X
+
+                            </button>
+
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="order-total">
+
+                        Total:
+                        ₹<span id="orderTotal">0.00</span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="orderStatus">
+                        Order Status
+                    </label>
+
+                    <select
+                            id="orderStatus">
+
+                        <option value="PENDING">
+                            Pending
+                        </option>
+
+                        <option value="CONFIRMED">
+                            Confirmed
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="specialInstructions">
+                        Special Instructions
+                    </label>
+
+                    <textarea
+                            id="specialInstructions"
+                            placeholder="Example: Less spicy, no onion..."
+                    ></textarea>
+
+                </div>
+
+
+                <button
+                        type="submit"
+                        class="btn">
+
+                    Create Order
+
+                </button>
+
+
+            </form>
+
+        </div>
+
+
+        <!-- ================= ORDER LIST ================= -->
+
+        <div class="card">
+
+            <h2>📋 Order List</h2>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                    <tr>
+
+                        <th>ID</th>
+
+                        <th>Customer</th>
+
+                        <th>Table</th>
+
+                        <th>Status</th>
+
+                        <th>Instructions</th>
+
+                        <th>Actions</th>
+
+                    </tr>
+
+                    </thead>
+
+
+                    <tbody id="orderTableBody">
+
+                    <tr>
+
+                        <td
+                                colspan="6"
+                                style="
+                                text-align:center;
+                                padding:30px;
+                                ">
+
+                            Loading orders...
+
+                        </td>
+
+                    </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+
+    <p>
+        © 2026 TableTurn Restaurant Management System
+    </p>
+
+</footer>
+
+
+<script>
+
+
+    /* =========================================
+       API URLS
+    ========================================= */
+
+    const ORDER_API_URL =
+        "/api/orders";
+
+    const ORDER_ITEM_API_URL =
+        "/api/order-items";
+
+    const TABLE_API_URL =
+        "/api/tables";
+
+
+    /* =========================================
+       PAGE LOAD
+    ========================================= */
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            loadTables();
+
+            loadOrders();
+
+            updateTotal();
+
+        }
+    );
+
+
+    /* =========================================
+       LOAD TABLES
+    ========================================= */
+
+    async function loadTables() {
+
+        try {
+
+            const response =
+                await fetch(TABLE_API_URL);
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Unable to load tables"
+                );
+
+            }
+
+
+            const tables =
+                await response.json();
+
+
+            const select =
+                document.getElementById(
+                    "tableId"
+                );
+
+
+            select.innerHTML =
+                '<option value="">-- Select Table --</option>';
+
+
+            tables.forEach(
+                function (table) {
+
+                    const option =
+                        document.createElement(
+                            "option"
+                        );
+
+
+                    option.value =
+                        table.id;
+
+
+                    option.textContent =
+                        "Table " +
+                        table.tableNumber +
+                        " - Capacity: " +
+                        table.capacity;
+
+
+                    select.appendChild(
+                        option
+                    );
+
+                }
+            );
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            showMessage(
+                "Unable to load tables.",
+                "error"
+            );
+
+        }
+
+    }
+
+
+    /* =========================================
+       ADD ORDER ITEM
+    ========================================= */
+
+    function addItem() {
+
+        const container =
+            document.getElementById(
+                "itemsContainer"
+            );
+
+
+        const row =
+            document.createElement(
+                "div"
+            );
+
+
+        row.className =
+            "item-row";
+
+
+        row.innerHTML = `
+
+            <input
+                type="text"
+                class="item-name"
+                placeholder="Item name"
+                required
+            >
+
+            <input
+                type="number"
+                class="item-quantity"
+                placeholder="Qty"
+                min="1"
+                value="1"
+                required
+            >
+
+            <input
+                type="number"
+                class="item-price"
+                placeholder="Price"
+                min="0"
+                step="0.01"
+                required
+            >
+
+            <button
+                type="button"
+                class="remove-item-btn"
+                onclick="removeItem(this)">
+
+                X
+
+            </button>
+
+        `;
+
+
+        container.appendChild(row);
+
+
+        attachTotalListeners();
+
+    }
+
+
+    /* =========================================
+       REMOVE ORDER ITEM
+    ========================================= */
+
+    function removeItem(button) {
+
+        const container =
+            document.getElementById(
+                "itemsContainer"
+            );
+
+
+        const rows =
+            container.querySelectorAll(
+                ".item-row"
+            );
+
+
+        /*
+         * Keep at least one item.
+         */
+
+        if (rows.length <= 1) {
+
+            showMessage(
+                "At least one order item is required.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        button
+            .parentElement
+            .remove();
+
+
+        updateTotal();
+
+    }
+
+
+    /* =========================================
+       CALCULATE TOTAL
+    ========================================= */
+
+    function updateTotal() {
+
+        const quantities =
+            document.querySelectorAll(
+                ".item-quantity"
+            );
+
+        const prices =
+            document.querySelectorAll(
+                ".item-price"
+            );
+
+
+        let total = 0;
+
+
+        for (
+            let i = 0;
+            i < quantities.length;
+            i++
+        ) {
+
+            const quantity =
+                Number(
+                    quantities[i].value
+                ) || 0;
+
+
+            const price =
+                Number(
+                    prices[i].value
+                ) || 0;
+
+
+            total +=
+                quantity * price;
+
+        }
+
+
+        document.getElementById(
+            "orderTotal"
+        ).textContent =
+            total.toFixed(2);
+
+    }
+
+
+    /* =========================================
+       TOTAL INPUT LISTENERS
+    ========================================= */
+
+    function attachTotalListeners() {
+
+        const inputs =
+            document.querySelectorAll(
+                ".item-quantity, .item-price"
+            );
+
+
+        inputs.forEach(
+            function (input) {
+
+                input.addEventListener(
+                    "input",
+                    updateTotal
+                );
+
+            }
+        );
+
+    }
+
+
+    attachTotalListeners();
+
+
+    /* =========================================
+       CREATE ORDER
+    ========================================= */
+
+    document
+        .getElementById("orderForm")
+        .addEventListener(
+            "submit",
+            async function (event) {
+
+                event.preventDefault();
+
+
+                const itemRows =
+                    document.querySelectorAll(
+                        ".item-row"
+                    );
+
+
+                const items = [];
+
+
+                itemRows.forEach(
+                    function (row) {
+
+                        const itemName =
+                            row.querySelector(
+                                ".item-name"
+                            ).value.trim();
+
+
+                        const quantity =
+                            Number(
+                                row.querySelector(
+                                    ".item-quantity"
+                                ).value
+                            );
+
+
+                        const unitPrice =
+                            Number(
+                                row.querySelector(
+                                    ".item-price"
+                                ).value
+                            );
+
+
+                        const totalPrice =
+                            quantity *
+                            unitPrice;
+
+
+                        items.push({
+
+                            itemName:
+                            itemName,
+
+                            quantity:
+                            quantity,
+
+                            unitPrice:
+                            unitPrice,
+
+                            totalPrice:
+                            totalPrice
+
+                        });
+
+                    }
+                );
+
+
+                const order = {
+
+                    reservationId:
+                        document.getElementById(
+                            "reservationId"
+                        ).value
+                            ?
+                            Number(
+                                document.getElementById(
+                                    "reservationId"
+                                ).value
+                            )
+                            :
+                            null,
+
+                    tableId:
+                        Number(
+                            document.getElementById(
+                                "tableId"
+                            ).value
+                        ),
+
+                    customerName:
+                        document.getElementById(
+                            "customerName"
+                        ).value.trim(),
+
+                    orderStatus:
+                    document.getElementById(
+                        "orderStatus"
+                    ).value,
+
+                    specialInstructions:
+                        document.getElementById(
+                            "specialInstructions"
+                        ).value.trim()
+
+                };
+
+
+                try {
+
+                    /*
+                     * Create order first
+                     */
+
+                    const orderResponse =
+                        await fetch(
+                            ORDER_API_URL,
+                            {
+
+                                method: "POST",
+
+                                headers: {
+
+                                    "Content-Type":
+                                        "application/json"
+
+                                },
+
+                                body:
+                                    JSON.stringify(
+                                        order
+                                    )
+
+                            }
+                        );
+
+
+                    if (!orderResponse.ok) {
+
+                        throw new Error(
+                            "Failed to create order"
+                        );
+
+                    }
+
+
+                    const createdOrder =
+                        await orderResponse.json();
+
+
+                    /*
+                     * Create each order item
+                     */
+
+                    for (
+                        const item of items
+                        ) {
+
+                        const itemData = {
+
+                            orderId:
+                            createdOrder.id,
+
+                            itemName:
+                            item.itemName,
+
+                            quantity:
+                            item.quantity,
+
+                            unitPrice:
+                            item.unitPrice,
+
+                            totalPrice:
+                            item.totalPrice
+
+                        };
+
+
+                        const itemResponse =
+                            await fetch(
+                                ORDER_ITEM_API_URL,
+                                {
+
+                                    method: "POST",
+
+                                    headers: {
+
+                                        "Content-Type":
+                                            "application/json"
+
+                                    },
+
+                                    body:
+                                        JSON.stringify(
+                                            itemData
+                                        )
+
+                                }
+                            );
+
+
+                        if (!itemResponse.ok) {
+
+                            console.error(
+                                "Order created but item creation failed"
+                            );
+
+                        }
+
+                    }
+
+
+                    showMessage(
+                        "Order created successfully!",
+                        "success"
+                    );
+
+
+                    document
+                        .getElementById(
+                            "orderForm"
+                        )
+                        .reset();
+
+
+                    /*
+                     * Reset item list
+                     */
+
+                    document.getElementById(
+                        "itemsContainer"
+                    ).innerHTML = `
+
+                        <div class="item-row">
+
+                            <input
+                                type="text"
+                                class="item-name"
+                                placeholder="Item name"
+                                required
+                            >
+
+                            <input
+                                type="number"
+                                class="item-quantity"
+                                placeholder="Qty"
+                                min="1"
+                                value="1"
+                                required
+                            >
+
+                            <input
+                                type="number"
+                                class="item-price"
+                                placeholder="Price"
+                                min="0"
+                                step="0.01"
+                                required
+                            >
+
+                            <button
+                                type="button"
+                                class="remove-item-btn"
+                                onclick="removeItem(this)">
+
+                                X
+
+                            </button>
+
+                        </div>
+
+                    `;
+
+
+                    attachTotalListeners();
+
+                    updateTotal();
+
+                    loadOrders();
+
+
+                } catch (error) {
+
+                    console.error(error);
+
+                    showMessage(
+                        "Failed to create order.",
+                        "error"
+                    );
+
+                }
+
+            }
+        );
+
+
+    /* =========================================
+       LOAD ORDERS
+    ========================================= */
+
+    async function loadOrders() {
+
+        try {
+
+            const response =
+                await fetch(
+                    ORDER_API_URL
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Failed to load orders"
+                );
+
+            }
+
+
+            const orders =
+                await response.json();
+
+
+            displayOrders(orders);
+
+
+        } catch (error) {
+
+            console.error(error);
+
+
+            document.getElementById(
+                "orderTableBody"
+            ).innerHTML = `
+
+                <tr>
+
+                    <td
+                        colspan="6"
+                        style="
+                        text-align:center;
+                        color:red;
+                        ">
+
+                        Unable to load orders.
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        }
+
+    }
+
+
+    /* =========================================
+       DISPLAY ORDERS
+    ========================================= */
+
+    function displayOrders(orders) {
+
+        const tbody =
+            document.getElementById(
+                "orderTableBody"
+            );
+
+
+        if (
+            !orders ||
+            orders.length === 0
+        ) {
+
+            tbody.innerHTML = `
+
+                <tr>
+
+                    <td
+                        colspan="6"
+                        style="
+                        text-align:center;
+                        padding:30px;
+                        ">
+
+                        No orders found.
+
+                    </td>
+
+                </tr>
+
+            `;
+
+            return;
+
+        }
+
+
+        tbody.innerHTML = "";
+
+
+        orders.forEach(
+            function (order) {
+
+                const row =
+                    document.createElement(
+                        "tr"
+                    );
+
+
+                const status =
+                    order.orderStatus ||
+                    "PENDING";
+
+
+                row.innerHTML = `
+
+                    <td>
+                        ${order.id}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                    order.customerName ||
+                    "-"
+                )}
+                    </td>
+
+                    <td>
+                        ${order.tableId || "-"}
+                    </td>
+
+                    <td>
+
+                        <span
+                            class="status
+                            ${getStatusClass(status)}">
+
+                            ${status}
+
+                        </span>
+
+                    </td>
+
+                    <td>
+
+                        ${escapeHtml(
+                    order.specialInstructions ||
+                    "-"
+                )}
+
+                    </td>
+
+                    <td>
+
+                        ${getActionButtons(
+                    order.id,
+                    status
+                )}
+
+                    </td>
+
+                `;
+
+
+                tbody.appendChild(row);
+
+            }
+        );
+
+    }
+
+
+    /* =========================================
+       ACTION BUTTONS
+    ========================================= */
+
+    function getActionButtons(
+        id,
+        status
+    ) {
+
+        const current =
+            String(status).toUpperCase();
+
+
+        let buttons = "";
+
+
+        if (
+            current === "PENDING"
+        ) {
+
+            buttons += `
+
+                <button
+                    class="action-btn confirm-btn"
+                    onclick="
+                        updateOrderStatus(
+                            ${id},
+                            'CONFIRMED'
+                        )
+                    ">
+
+                    Confirm
+
+                </button>
+
+            `;
+
+        }
+
+
+        if (
+            current === "CONFIRMED"
+        ) {
+
+            buttons += `
+
+                <button
+                    class="action-btn preparing-btn"
+                    onclick="
+                        updateOrderStatus(
+                            ${id},
+                            'PREPARING'
+                        )
+                    ">
+
+                    Preparing
+
+                </button>
+
+            `;
+
+        }
+
+
+        if (
+            current === "PREPARING"
+        ) {
+
+            buttons += `
+
+                <button
+                    class="action-btn ready-btn"
+                    onclick="
+                        updateOrderStatus(
+                            ${id},
+                            'READY'
+                        )
+                    ">
+
+                    Ready
+
+                </button>
+
+            `;
+
+        }
+
+
+        if (
+            current === "READY"
+        ) {
+
+            buttons += `
+
+                <button
+                    class="action-btn complete-btn"
+                    onclick="
+                        updateOrderStatus(
+                            ${id},
+                            'COMPLETED'
+                        )
+                    ">
+
+                    Complete
+
+                </button>
+
+            `;
+
+        }
+
+
+        if (
+            current !== "COMPLETED" &&
+            current !== "CANCELLED"
+        ) {
+
+            buttons += `
+
+                <button
+                    class="action-btn cancel-btn"
+                    onclick="
+                        updateOrderStatus(
+                            ${id},
+                            'CANCELLED'
+                        )
+                    ">
+
+                    Cancel
+
+                </button>
+
+            `;
+
+        }
+
+
+        buttons += `
+
+            <button
+                class="action-btn delete-btn"
+                onclick="
+                    deleteOrder(${id})
+                ">
+
+                Delete
+
+            </button>
+
+        `;
+
+
+        return buttons;
+
+    }
+
+
+    /* =========================================
+       UPDATE ORDER STATUS
+    ========================================= */
+
+    async function updateOrderStatus(
+        id,
+        newStatus
+    ) {
+
+        try {
+
+            /*
+             * Get existing order
+             */
+
+            const getResponse =
+                await fetch(
+                    ORDER_API_URL +
+                    "/" +
+                    id
+                );
+
+
+            if (!getResponse.ok) {
+
+                throw new Error(
+                    "Order not found"
+                );
+
+            }
+
+
+            const order =
+                await getResponse.json();
+
+
+            order.orderStatus =
+                newStatus;
+
+
+            const response =
+                await fetch(
+                    ORDER_API_URL +
+                    "/" +
+                    id,
+                    {
+
+                        method: "PUT",
+
+                        headers: {
+
+                            "Content-Type":
+                                "application/json"
+
+                        },
+
+                        body:
+                            JSON.stringify(order)
+
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Failed to update order"
+                );
+
+            }
+
+
+            showMessage(
+                "Order status updated to " +
+                newStatus,
+                "success"
+            );
+
+
+            loadOrders();
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            showMessage(
+                "Unable to update order.",
+                "error"
+            );
+
+        }
+
+    }
+
+
+    /* =========================================
+       DELETE ORDER
+    ========================================= */
+
+    async function deleteOrder(id) {
+
+        const confirmed =
+            confirm(
+                "Are you sure you want to delete this order?"
+            );
+
+
+        if (!confirmed) {
+
+            return;
+
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    ORDER_API_URL +
+                    "/" +
+                    id,
+                    {
+
+                        method: "DELETE"
+
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Failed to delete order"
+                );
+
+            }
+
+
+            showMessage(
+                "Order deleted successfully.",
+                "success"
+            );
+
+
+            loadOrders();
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            showMessage(
+                "Unable to delete order.",
+                "error"
+            );
+
+        }
+
+    }
+
+
+    /* =========================================
+       STATUS CLASS
+    ========================================= */
+
+    function getStatusClass(
+        status
+    ) {
+
+        const value =
+            String(status)
+                .toUpperCase();
+
+
+        switch (value) {
+
+            case "CONFIRMED":
+                return "confirmed";
+
+            case "PREPARING":
+                return "preparing";
+
+            case "READY":
+                return "ready";
+
+            case "COMPLETED":
+                return "completed";
+
+            case "CANCELLED":
+                return "cancelled";
+
+            default:
+                return "pending";
+
+        }
+
+    }
+
+
+    /* =========================================
+       MESSAGE
+    ========================================= */
+
+    function showMessage(
+        message,
+        type
+    ) {
+
+        const element =
+            document.getElementById(
+                "message"
+            );
+
+
+        element.textContent =
+            message;
+
+
+        element.className =
+            "message " + type;
+
+
+        element.style.display =
+            "block";
+
+
+        setTimeout(
+            function () {
+
+                element.style.display =
+                    "none";
+
+            },
+            4000
+        );
+
+    }
+
+
+    /* =========================================
+       HTML ESCAPE
+    ========================================= */
+
+    function escapeHtml(value) {
+
+        return String(value)
+
+            .replace(
+                /&/g,
+                "&amp;"
+            )
+
+            .replace(
+                /</g,
+                "&lt;"
+            )
+
+            .replace(
+                />/g,
+                "&gt;"
+            )
+
+            .replace(
+                /"/g,
+                "&quot;"
+            )
+
+            .replace(
+                /'/g,
+                "&#039;"
+            );
+
+    }
+
+</script>
+
+
+</body>
+
+</html>
